@@ -23,7 +23,9 @@ def create_app():
     db.init_app(app)
 
     from app.routes.empresa import empresa_bp
+    from app.routes.sped import sped_bp
     app.register_blueprint(empresa_bp)
+    app.register_blueprint(sped_bp)
 
     with app.app_context():
         db.create_all()
