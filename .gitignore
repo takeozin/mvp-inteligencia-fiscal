@@ -1,0 +1,92 @@
+# ============================================================
+# SEGURANÇA — NUNCA COMITAR ESTES ARQUIVOS
+# ============================================================
+
+# Variáveis de ambiente (credenciais reais)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Bancos de dados locais
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Arquivos de upload (SPEDs dos clientes — dados sensíveis)
+uploads/
+storage/
+*.txt.sped
+*.efd
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependências Node.js
+node_modules/
+.npm
+.pnp
+.pnp.js
+package-lock.json
+
+# Dependências Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Relatórios gerados (PDFs com dados dos clientes)
+relatorios/
+pareceres/
+output/
+*.pdf
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Cache e build
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+dist/
+build/
+*.map
+
+# Certificados e chaves
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Cobertura de testes
+coverage/
+.nyc_output/
+htmlcov/
+.coverage
