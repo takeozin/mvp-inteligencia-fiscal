@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}{{ empresa.nome }}{% endblock %}
+
+{% block content %}
+<h2>{{ empresa.nome }}</h2>
+<table style="max-width:400px; margin-bottom:16px;">
+    <tr><th>ID</th><td>{{ empresa.id }}</td></tr>
+    <tr><th>CNPJ</th><td>{{ empresa.cnpj }}</td></tr>
+    <tr><th>Razão Social</th><td>{{ empresa.nome }}</td></tr>
+    <tr><th>Arquivos SPED</th><td>{{ empresa.arquivos | length }}</td></tr>
+</table>
+
+<div style="display:flex; gap:10px;">
+    <a href="{{ url_for('empresa.index') }}" class="btn">← Voltar</a>
+    <span class="btn" style="color:#999; cursor:default;" title="Disponível na Etapa 2">Upload SPED (em breve)</span>
+</div>
+{% endblock %}

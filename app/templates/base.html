@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MVP Inteligência Fiscal{% endblock %}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; font-size: 14px; background: #f4f4f4; color: #222; }
+        nav { background: #1a1a2e; color: #fff; padding: 10px 20px; display: flex; gap: 20px; align-items: center; }
+        nav a { color: #eee; text-decoration: none; }
+        nav a:hover { text-decoration: underline; }
+        nav strong { margin-right: 10px; font-size: 15px; }
+        .container { max-width: 960px; margin: 20px auto; padding: 0 15px; }
+        .flash { padding: 8px 12px; margin-bottom: 12px; border-radius: 3px; border: 1px solid; }
+        .flash.sucesso { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .flash.erro    { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .btn { display: inline-block; padding: 6px 14px; border: 1px solid #555; border-radius: 3px; background: #fff; cursor: pointer; text-decoration: none; color: #222; font-size: 13px; }
+        .btn:hover { background: #e8e8e8; }
+        .btn-primary { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+        .btn-primary:hover { background: #2a2a4e; }
+        .btn-danger { background: #c0392b; color: #fff; border-color: #c0392b; }
+        .btn-danger:hover { background: #a93226; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 8px 10px; border: 1px solid #ccc; text-align: left; }
+        th { background: #ddd; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        form label { display: block; margin-bottom: 4px; font-weight: bold; }
+        form input[type=text] { width: 100%; padding: 6px 8px; border: 1px solid #bbb; border-radius: 3px; font-size: 14px; }
+        form input[type=text]:focus { outline: 2px solid #1a1a2e; }
+        .form-group { margin-bottom: 14px; }
+        h2 { margin-bottom: 14px; }
+        .hint { font-size: 11px; color: #666; margin-top: 3px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>⚖ Fiscal MVP</strong>
+        <a href="{{ url_for('empresa.index') }}">Empresas</a>
+    </nav>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for categoria, msg in messages %}
+                <div class="flash {{ categoria }}">{{ msg }}</div>
+            {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
