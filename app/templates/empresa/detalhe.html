@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}{{ empresa.nome }}{% endblock %}
+
+{% block content %}
+<h2>{{ empresa.nome }}</h2>
+
+<table style="max-width:420px; margin-bottom:16px;">
+    <tr><th>ID</th><td>{{ empresa.id }}</td></tr>
+    <tr><th>CNPJ</th><td>{{ empresa.cnpj }}</td></tr>
+    <tr><th>Razão Social</th><td>{{ empresa.nome }}</td></tr>
+    <tr><th>Arquivos SPED</th><td>{{ empresa.arquivos | length }}</td></tr>
+</table>
+
+<div style="display:flex; gap:10px; margin-bottom:20px;">
+    <a href="{{ url_for('empresa.index') }}" class="btn">← Voltar</a>
+    <a href="{{ url_for('sped.upload_sped', empresa_id=empresa.id) }}" class="btn btn-primary">↑ Upload SPED</a>
+</div>
+
+<h3 style="margin-bottom:10px;">Arquivos Enviados</h3>
+
+{% if empresa.arquivos %}
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Arquivo</th>
+            <th>Período</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for arq in empresa.arquivos %}
+        <tr>
+            <td>{{ arq.id }}</td>
+            <td>{{ arq.nome_arquivo }}</td>
+            <td>{{ arq.periodo_apuracao or 'N/D' }}</td>
+            <td>
+                {% if arq.processado %}
+                    <span style="color:green;">✔ Processado</span>
+                {% else %}
+                    <span style="color:#888;">Aguardando</span>
+                {% endif %}
+            </td>
+                <td>
+                    {% if arq.processado %}
+                        <a href="{{ url_for('sped.resultado_sped', sped_id=arq.id) }}" class="btn" style="font-size:12px;">Ver Resultado</a>
+                    {% else %}
+                        <form method="POST"
+                              action="{{ url_for('sped.processar_sped', sped_id=arq.id) }}"
+                              style="display:inline">
+                            <button type="submit" class="btn btn-primary" style="font-size:12px;">Processar</button>
+                        </form>
+                    {% endif %}
+
+                    <form method="POST"
+                          action="{{ url_for('sped.excluir_sped', sped_id=arq.id) }}"
+                          style="display:inline"
+                          onsubmit="return confirm('Remover arquivo {{ arq.nome_arquivo }}?')">
+                        <button type="submit" class="btn btn-danger" style="font-size:12px;">Remover</button>
+                    </form>
+                </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="color:#666;">Nenhum arquivo enviado ainda. Use o botão "Upload SPED" acima.</p>
+{% endif %}
+{% endblock %}

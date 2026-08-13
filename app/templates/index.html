@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Empresas Cadastradas{% endblock %}
+
+{% block content %}
+<h2>Empresas Cadastradas</h2>
+<p style="margin-bottom:12px;">
+    <a href="{{ url_for('empresa.nova_empresa') }}" class="btn btn-primary">+ Nova Empresa</a>
+</p>
+
+{% if empresas %}
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>CNPJ</th>
+            <th>Nome / Razão Social</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in empresas %}
+        <tr>
+            <td>{{ e.id }}</td>
+            <td>{{ e.cnpj }}</td>
+            <td>{{ e.nome }}</td>
+            <td>
+                <a href="{{ url_for('empresa.detalhe_empresa', empresa_id=e.id) }}" class="btn">Ver</a>
+                <form method="POST" action="{{ url_for('empresa.excluir_empresa', empresa_id=e.id) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Excluir empresa {{ e.nome }}?')">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="color:#666;">Nenhuma empresa cadastrada ainda.</p>
+{% endif %}
+{% endblock %}
