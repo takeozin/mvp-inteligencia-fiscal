@@ -1,11 +1,11 @@
 import os
 import uuid
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from werkzeug.utils import secure_filename
 from app import db
 from app.models import Empresa, ArquivoSPED, ResultadoParser
 from app.parser.sped_parser import SpedParser
-from app.routes.auth import login_required
+from app.routes.auth import login_required, get_empresa_ou_404
 
 sped_bp = Blueprint('sped', __name__)
 
@@ -44,7 +44,7 @@ def detectar_periodo(caminho_arquivo: str) -> str:
 @sped_bp.route('/empresa/<int:empresa_id>/upload', methods=['GET', 'POST'])
 @login_required
 def upload_sped(empresa_id):
-    empresa = Empresa.query.get_or_404(empresa_id)
+    empresa = get_empresa_ou_404(empresa_id)
 
     if request.method == 'POST':
         arquivo = request.files.get('arquivo_sped')
@@ -100,6 +100,8 @@ def upload_sped(empresa_id):
 @login_required
 def excluir_sped(sped_id):
     sped = ArquivoSPED.query.get_or_404(sped_id)
+    # Valida que a empresa do SPED pertence ao usuário logado
+    get_empresa_ou_404(sped.empresa_id)
     empresa_id = sped.empresa_id
 
     # Remove o arquivo físico
@@ -121,6 +123,8 @@ def excluir_sped(sped_id):
 def processar_sped(sped_id):
     """Executa o parser no arquivo SPED e salva o resultado no banco."""
     sped = ArquivoSPED.query.get_or_404(sped_id)
+    # Valida que a empresa do SPED pertence ao usuário logado
+    get_empresa_ou_404(sped.empresa_id)
 
     if not os.path.exists(sped.caminho):
         flash('Arquivo físico não encontrado no servidor.', 'erro')
@@ -180,5 +184,7 @@ def processar_sped(sped_id):
 def resultado_sped(sped_id):
     """Exibe o resultado da leitura do SPED."""
     sped = ArquivoSPED.query.get_or_404(sped_id)
+    # Valida ownership
+    get_empresa_ou_404(sped.empresa_id)
     resultado = ResultadoParser.query.filter_by(arquivo_id=sped_id).first_or_404()
     return render_template('sped/resultado.html', sped=sped, r=resultado)

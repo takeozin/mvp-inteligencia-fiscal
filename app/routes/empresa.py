@@ -1,8 +1,8 @@
 import re
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app import db
 from app.models import Empresa
-from app.routes.auth import login_required
+from app.routes.auth import login_required, get_empresa_ou_404
 
 empresa_bp = Blueprint('empresa', __name__)
 
@@ -38,7 +38,9 @@ def validar_cnpj(cnpj: str) -> bool:
 @empresa_bp.route('/')
 @login_required
 def index():
-    empresas = Empresa.query.order_by(Empresa.nome).all()
+    empresas = Empresa.query.filter_by(
+        usuario_id=session['usuario_id']
+    ).order_by(Empresa.nome).all()
     return render_template('index.html', empresas=empresas)
 
 
@@ -66,7 +68,11 @@ def nova_empresa():
             flash(f'CNPJ {cnpj_formatado} já cadastrado para "{existente.nome}".', 'erro')
             return render_template('empresa/form.html', cnpj=cnpj_raw, nome=nome)
 
-        empresa = Empresa(cnpj=cnpj_formatado, nome=nome)
+        empresa = Empresa(
+            cnpj=cnpj_formatado,
+            nome=nome,
+            usuario_id=session['usuario_id']
+        )
         db.session.add(empresa)
         db.session.commit()
 
@@ -79,14 +85,14 @@ def nova_empresa():
 @empresa_bp.route('/empresa/<int:empresa_id>')
 @login_required
 def detalhe_empresa(empresa_id):
-    empresa = Empresa.query.get_or_404(empresa_id)
+    empresa = get_empresa_ou_404(empresa_id)
     return render_template('empresa/detalhe.html', empresa=empresa)
 
 
 @empresa_bp.route('/empresa/<int:empresa_id>/excluir', methods=['POST'])
 @login_required
 def excluir_empresa(empresa_id):
-    empresa = Empresa.query.get_or_404(empresa_id)
+    empresa = get_empresa_ou_404(empresa_id)
     nome = empresa.nome
     db.session.delete(empresa)
     db.session.commit()

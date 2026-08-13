@@ -4,13 +4,13 @@ from flask import (
     redirect, url_for, session, flash
 )
 from app import db
-from app.models import Usuario
+from app.models import Usuario, Empresa
 
 auth_bp = Blueprint('auth', __name__)
 
 
 # ─────────────────────────────────────────────
-# Decorator de proteção de rotas
+# Helpers de autenticação e ownership
 # ─────────────────────────────────────────────
 
 def login_required(f):
@@ -22,6 +22,17 @@ def login_required(f):
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated
+
+
+def get_empresa_ou_404(empresa_id):
+    """
+    Retorna a Empresa se ela pertencer ao usuário logado.
+    Retorna 404 caso contrário — sem revelar que o ID existe.
+    """
+    return Empresa.query.filter_by(
+        id=empresa_id,
+        usuario_id=session['usuario_id']
+    ).first_or_404()
 
 
 # ─────────────────────────────────────────────

@@ -29,10 +29,13 @@ class Usuario(db.Model):
 class Empresa(db.Model):
     __tablename__ = 'empresa'
 
-    id = db.Column(db.Integer, primary_key=True)
-    cnpj = db.Column(db.String(18), unique=True, nullable=False)
-    nome = db.Column(db.String(200), nullable=False)
+    id         = db.Column(db.Integer, primary_key=True)
+    cnpj       = db.Column(db.String(18), unique=True, nullable=False)
+    nome       = db.Column(db.String(200), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False, index=True)
 
+    # Dono da empresa
+    dono    = db.relationship('Usuario', backref='empresas')
     # Relacionamento com arquivos SPED enviados
     arquivos = db.relationship('ArquivoSPED', backref='empresa', lazy=True)
 

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, send_fil
 from app import db
 from app.models import ArquivoSPED, ResultadoParser, ResultadoCalculo
 from app.parser.calculadora import calcular_tema_69
-from app.routes.auth import login_required
+from app.routes.auth import login_required, get_empresa_ou_404
 
 calculo_bp = Blueprint('calculo', __name__)
 
@@ -12,6 +12,7 @@ calculo_bp = Blueprint('calculo', __name__)
 def calcular(sped_id):
     """Executa o motor de cálculo do Tema 69 sobre o resultado do parser."""
     sped = ArquivoSPED.query.get_or_404(sped_id)
+    get_empresa_ou_404(sped.empresa_id)
     parser = ResultadoParser.query.filter_by(arquivo_id=sped_id).first()
 
     if not parser:
@@ -80,6 +81,7 @@ def calcular(sped_id):
 def ver_calculo(sped_id):
     """Exibe o resultado do cálculo do Tema 69."""
     sped = ArquivoSPED.query.get_or_404(sped_id)
+    get_empresa_ou_404(sped.empresa_id)
     parser = ResultadoParser.query.filter_by(arquivo_id=sped_id).first_or_404()
     c = ResultadoCalculo.query.filter_by(arquivo_id=sped_id).first_or_404()
     return render_template('calculo/resultado.html', sped=sped, parser=parser, c=c)
@@ -90,6 +92,7 @@ def ver_calculo(sped_id):
 def gerar_pdf(sped_id):
     """Gera o relatório em PDF e envia para download."""
     sped   = ArquivoSPED.query.get_or_404(sped_id)
+    get_empresa_ou_404(sped.empresa_id)
     parser = ResultadoParser.query.filter_by(arquivo_id=sped_id).first()
     c      = ResultadoCalculo.query.filter_by(arquivo_id=sped_id).first()
 
@@ -123,6 +126,7 @@ def gerar_pdf(sped_id):
 def gerar_parecer(sped_id):
     """Gera a Minuta de Parecer em Word e envia para download."""
     sped   = ArquivoSPED.query.get_or_404(sped_id)
+    get_empresa_ou_404(sped.empresa_id)
     parser = ResultadoParser.query.filter_by(arquivo_id=sped_id).first()
     c      = ResultadoCalculo.query.filter_by(arquivo_id=sped_id).first()
 
