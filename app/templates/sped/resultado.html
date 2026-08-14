@@ -2,44 +2,75 @@
 {% block title %}Resultado da Leitura SPED{% endblock %}
 
 {% block content %}
-<h2>Resultado da Leitura — {{ sped.nome_arquivo }}</h2>
-<p style="color:#555; margin-bottom:16px;">
-    Empresa: <strong>{{ r.nome_empresa or sped.empresa.nome }}</strong>
-    &nbsp;|&nbsp; CNPJ: <strong>{{ r.cnpj_empresa or sped.empresa.cnpj }}</strong>
-    &nbsp;|&nbsp; Período: <strong>{{ r.periodo_ini }} a {{ r.periodo_fim }}</strong>
-</p>
 
-<!-- BLOCO 1: Dados extraídos das notas (Bloco C) -->
-<h3 style="margin-bottom:8px; border-bottom:1px solid #ccc; padding-bottom:4px;">
-    Dados Extraídos das Notas Fiscais de Saída (Bloco C)
-</h3>
-<table style="max-width:600px; margin-bottom:20px;">
-    <tr><th>Total de NFs de saída lidas</th><td>{{ r.total_notas_saida }}</td></tr>
-    <tr><th>Receita Bruta Total</th>
-        <td>R$ {{ "%.2f"|format(r.receita_bruta_total|float) }}</td></tr>
-    <tr><th>ICMS Destacado nas NFs (saídas)</th>
-        <td><strong>R$ {{ "%.2f"|format(r.icms_total_saidas|float) }}</strong></td></tr>
-    <tr><th>ICMS-ST nas NFs (saídas)</th>
-        <td>R$ {{ "%.2f"|format(r.icms_st_total_saidas|float) }}</td></tr>
+<div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+    <a href="{{ url_for('empresa.detalhe_empresa', empresa_id=sped.empresa_id) }}" class="btn">← Voltar</a>
+    <h2 style="margin-bottom:0;">Resultado da Leitura SPED</h2>
+</div>
+
+<!-- Cabeçalho -->
+<div class="card mb-24" style="padding: 16px 24px;">
+    <div style="display:flex; gap:32px; flex-wrap:wrap; font-size:0.88rem;">
+        <div>
+            <span class="text-muted">Empresa</span><br>
+            <strong>{{ r.nome_empresa or sped.empresa.nome }}</strong>
+        </div>
+        <div>
+            <span class="text-muted">CNPJ</span><br>
+            <strong>{{ r.cnpj_empresa or sped.empresa.cnpj }}</strong>
+        </div>
+        <div>
+            <span class="text-muted">Período</span><br>
+            <strong>{{ r.periodo_ini }} a {{ r.periodo_fim }}</strong>
+        </div>
+        <div>
+            <span class="text-muted">Arquivo</span><br>
+            <strong>{{ sped.nome_arquivo }}</strong>
+        </div>
+    </div>
+</div>
+
+<!-- BLOCO 1: Notas Fiscais (Bloco C) -->
+<h3>Dados Extraídos das Notas Fiscais de Saída (Bloco C)</h3>
+<table class="mb-24" style="max-width:640px;">
+    <tr>
+        <th>Total de NFs de saída lidas</th>
+        <td>{{ r.total_notas_saida }}</td>
+    </tr>
+    <tr>
+        <th>Receita Bruta Total</th>
+        <td>R$ {{ "%.2f"|format(r.receita_bruta_total|float) }}</td>
+    </tr>
+    <tr>
+        <th>ICMS Destacado nas NFs (saídas)</th>
+        <td class="text-gold fw-bold">R$ {{ "%.2f"|format(r.icms_total_saidas|float) }}</td>
+    </tr>
+    <tr>
+        <th>ICMS-ST nas NFs (saídas)</th>
+        <td>R$ {{ "%.2f"|format(r.icms_st_total_saidas|float) }}</td>
+    </tr>
 </table>
 
-<!-- BLOCO 2: PIS e COFINS declarados -->
-<h3 style="margin-bottom:8px; border-bottom:1px solid #ccc; padding-bottom:4px;">
-    PIS e COFINS Conforme Declarado
-</h3>
-<table style="max-width:600px; margin-bottom:20px;">
+<!-- BLOCO 2: PIS e COFINS Declarados -->
+<h3>PIS e COFINS Conforme Declarado</h3>
+<table class="mb-24" style="max-width:640px;">
     <thead>
-        <tr><th>Tributo</th><th>Base de Cálculo</th><th>Alíquota</th><th>Valor Pago</th></tr>
+        <tr>
+            <th>Tributo</th>
+            <th>Base de Cálculo</th>
+            <th>Alíquota</th>
+            <th>Valor Pago</th>
+        </tr>
     </thead>
     <tbody>
         <tr>
-            <td><strong>PIS</strong></td>
+            <td class="fw-bold">PIS</td>
             <td>R$ {{ "%.2f"|format(r.vl_bc_pis_declarado|float) }}</td>
             <td>{{ "%.4f"|format(r.aliq_pis_media|float) }}%</td>
             <td>R$ {{ "%.2f"|format(r.vl_pis_declarado|float) }}</td>
         </tr>
         <tr>
-            <td><strong>COFINS</strong></td>
+            <td class="fw-bold">COFINS</td>
             <td>R$ {{ "%.2f"|format(r.vl_bc_cofins_declarado|float) }}</td>
             <td>{{ "%.4f"|format(r.aliq_cofins_media|float) }}%</td>
             <td>R$ {{ "%.2f"|format(r.vl_cofins_declarado|float) }}</td>
@@ -47,23 +78,25 @@
     </tbody>
 </table>
 
-<!-- BLOCO 3: Bloco M (apuração oficial) -->
+<!-- BLOCO 3: Apuração Oficial (Bloco M) -->
 {% if r.m_vl_bc_pis|float > 0 or r.m_vl_bc_cofins|float > 0 %}
-<h3 style="margin-bottom:8px; border-bottom:1px solid #ccc; padding-bottom:4px;">
-    Apuração Oficial (Bloco M)
-</h3>
-<table style="max-width:600px; margin-bottom:20px;">
+<h3>Apuração Oficial (Bloco M)</h3>
+<table class="mb-24" style="max-width:640px;">
     <thead>
-        <tr><th>Tributo</th><th>Base (M100/M500)</th><th>Valor Apurado (M200/M600)</th></tr>
+        <tr>
+            <th>Tributo</th>
+            <th>Base (M100/M500)</th>
+            <th>Valor Apurado (M200/M600)</th>
+        </tr>
     </thead>
     <tbody>
         <tr>
-            <td><strong>PIS</strong></td>
+            <td class="fw-bold">PIS</td>
             <td>R$ {{ "%.2f"|format(r.m_vl_bc_pis|float) }}</td>
             <td>R$ {{ "%.2f"|format(r.m_vl_pis_apurado|float) }}</td>
         </tr>
         <tr>
-            <td><strong>COFINS</strong></td>
+            <td class="fw-bold">COFINS</td>
             <td>R$ {{ "%.2f"|format(r.m_vl_bc_cofins|float) }}</td>
             <td>R$ {{ "%.2f"|format(r.m_vl_cofins_apurado|float) }}</td>
         </tr>
@@ -71,11 +104,11 @@
 </table>
 {% endif %}
 
-<!-- Avisos -->
+<!-- Avisos do Parser -->
 {% if r.avisos %}
-<div style="background:#fff8e1; border:1px solid #f0c040; padding:10px; margin-bottom:16px; border-radius:3px;">
+<div class="alert-warning mb-16">
     <strong>⚠ Avisos do Parser:</strong>
-    <ul style="margin:6px 0 0 18px;">
+    <ul style="margin: 6px 0 0 18px; line-height:1.7;">
         {% for aviso in r.avisos.split('\n') %}
             {% if aviso.strip() %}<li>{{ aviso }}</li>{% endif %}
         {% endfor %}
@@ -83,14 +116,16 @@
 </div>
 {% endif %}
 
-<div style="display:flex; gap:10px;">
+<!-- Ações -->
+<div class="flex-gap">
     <a href="{{ url_for('empresa.detalhe_empresa', empresa_id=sped.empresa_id) }}" class="btn">← Voltar</a>
     {% if sped.calculo %}
-        <a href="{{ url_for('calculo.ver_calculo', sped_id=sped.id) }}" class="btn btn-primary">Ver Cálculo</a>
+        <a href="{{ url_for('calculo.ver_calculo', sped_id=sped.id) }}" class="btn btn-primary">📊 Ver Cálculo</a>
     {% else %}
         <form method="POST" action="{{ url_for('calculo.calcular', sped_id=sped.id) }}" style="display:inline">
-            <button type="submit" class="btn btn-primary">Calcular Crédito (Tema 69)</button>
+            <button type="submit" class="btn btn-primary">⚡ Calcular Crédito (Tema 69)</button>
         </form>
     {% endif %}
 </div>
+
 {% endblock %}

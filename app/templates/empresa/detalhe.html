@@ -2,21 +2,23 @@
 {% block title %}{{ empresa.nome }}{% endblock %}
 
 {% block content %}
-<h2>{{ empresa.nome }}</h2>
-
-<table style="max-width:420px; margin-bottom:16px;">
-    <tr><th>ID</th><td>{{ empresa.id }}</td></tr>
-    <tr><th>CNPJ</th><td>{{ empresa.cnpj }}</td></tr>
-    <tr><th>Razão Social</th><td>{{ empresa.nome }}</td></tr>
-    <tr><th>Arquivos SPED</th><td>{{ empresa.arquivos | length }}</td></tr>
-</table>
-
-<div style="display:flex; gap:10px; margin-bottom:20px;">
+<div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
     <a href="{{ url_for('empresa.index') }}" class="btn">← Voltar</a>
-    <a href="{{ url_for('sped.upload_sped', empresa_id=empresa.id) }}" class="btn btn-primary">↑ Upload SPED</a>
+    <h2 style="margin-bottom:0;">{{ empresa.nome }}</h2>
 </div>
 
-<h3 style="margin-bottom:10px;">Arquivos Enviados</h3>
+<div class="card mb-24">
+    <table style="margin-bottom:0;">
+        <tr><th>CNPJ</th><td>{{ empresa.cnpj }}</td></tr>
+        <tr><th>Razão Social</th><td class="fw-bold">{{ empresa.nome }}</td></tr>
+        <tr><th>Arquivos SPED</th><td>{{ empresa.arquivos | length }}</td></tr>
+    </table>
+</div>
+
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+    <h3 style="margin-bottom:0; border:none; padding:0;">Arquivos SPED Enviados</h3>
+    <a href="{{ url_for('sped.upload_sped', empresa_id=empresa.id) }}" class="btn btn-primary">↑ Upload SPED</a>
+</div>
 
 {% if empresa.arquivos %}
 <table>
@@ -32,39 +34,42 @@
     <tbody>
         {% for arq in empresa.arquivos %}
         <tr>
-            <td>{{ arq.id }}</td>
+            <td class="text-muted">{{ arq.id }}</td>
             <td>{{ arq.nome_arquivo }}</td>
             <td>{{ arq.periodo_apuracao or 'N/D' }}</td>
             <td>
                 {% if arq.processado %}
-                    <span style="color:green;">✔ Processado</span>
+                    <span class="badge badge-green">✔ Processado</span>
                 {% else %}
-                    <span style="color:#888;">Aguardando</span>
+                    <span class="badge badge-muted">Aguardando</span>
                 {% endif %}
             </td>
-                <td>
+            <td>
+                <div class="flex-gap" style="margin-top:0;">
                     {% if arq.processado %}
-                        <a href="{{ url_for('sped.resultado_sped', sped_id=arq.id) }}" class="btn" style="font-size:12px;">Ver Resultado</a>
+                        <a href="{{ url_for('sped.resultado_sped', sped_id=arq.id) }}" class="btn">Ver Resultado</a>
                     {% else %}
                         <form method="POST"
                               action="{{ url_for('sped.processar_sped', sped_id=arq.id) }}"
                               style="display:inline">
-                            <button type="submit" class="btn btn-primary" style="font-size:12px;">Processar</button>
+                            <button type="submit" class="btn btn-primary">Processar</button>
                         </form>
                     {% endif %}
-
                     <form method="POST"
                           action="{{ url_for('sped.excluir_sped', sped_id=arq.id) }}"
                           style="display:inline"
                           onsubmit="return confirm('Remover arquivo {{ arq.nome_arquivo }}?')">
-                        <button type="submit" class="btn btn-danger" style="font-size:12px;">Remover</button>
+                        <button type="submit" class="btn btn-danger">Remover</button>
                     </form>
-                </td>
+                </div>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% else %}
-<p style="color:#666;">Nenhum arquivo enviado ainda. Use o botão "Upload SPED" acima.</p>
+<div class="card">
+    <p class="empty-state">Nenhum arquivo enviado ainda. Use o botão <strong>↑ Upload SPED</strong> acima.</p>
+</div>
 {% endif %}
 {% endblock %}

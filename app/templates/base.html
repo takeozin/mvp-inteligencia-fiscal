@@ -4,52 +4,462 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MVP Inteligência Fiscal{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; font-size: 14px; background: #f4f4f4; color: #222; }
-        nav { background: #1a1a2e; color: #fff; padding: 10px 20px; display: flex; gap: 20px; align-items: center; }
-        nav a { color: #eee; text-decoration: none; }
-        nav a:hover { text-decoration: underline; }
-        nav strong { margin-right: 10px; font-size: 15px; }
-        .container { max-width: 960px; margin: 20px auto; padding: 0 15px; }
-        .flash { padding: 8px 12px; margin-bottom: 12px; border-radius: 3px; border: 1px solid; }
-        .flash.sucesso { background: #d4edda; border-color: #c3e6cb; color: #155724; }
-        .flash.erro    { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
-        .btn { display: inline-block; padding: 6px 14px; border: 1px solid #555; border-radius: 3px; background: #fff; cursor: pointer; text-decoration: none; color: #222; font-size: 13px; }
-        .btn:hover { background: #e8e8e8; }
-        .btn-primary { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
-        .btn-primary:hover { background: #2a2a4e; }
-        .btn-danger { background: #c0392b; color: #fff; border-color: #c0392b; }
-        .btn-danger:hover { background: #a93226; }
-        table { width: 100%; border-collapse: collapse; background: #fff; }
-        th, td { padding: 8px 10px; border: 1px solid #ccc; text-align: left; }
-        th { background: #ddd; }
-        tr:nth-child(even) { background: #f9f9f9; }
-        form label { display: block; margin-bottom: 4px; font-weight: bold; }
-        form input[type=text] { width: 100%; padding: 6px 8px; border: 1px solid #bbb; border-radius: 3px; font-size: 14px; }
-        form input[type=text]:focus { outline: 2px solid #1a1a2e; }
-        .form-group { margin-bottom: 14px; }
-        h2 { margin-bottom: 14px; }
-        .hint { font-size: 11px; color: #666; margin-top: 3px; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-deep:      #080814;
+            --bg-mid:       #0f0f23;
+            --bg-card:      rgba(26, 26, 62, 0.55);
+            --bg-card-solid:rgba(18, 18, 48, 0.85);
+            --accent:       #6c63ff;
+            --accent-lt:    #8b84ff;
+            --accent-dk:    #4a43cc;
+            --gold:         #f5c542;
+            --green:        #3dd68c;
+            --red:          #ff5c73;
+            --text-main:    #e8e8f0;
+            --text-muted:   #7a7a9a;
+            --border:       rgba(108, 99, 255, 0.2);
+            --border-focus: rgba(108, 99, 255, 0.7);
+            --error-bg:     rgba(220, 53, 69, 0.15);
+            --error-bdr:    rgba(220, 53, 69, 0.4);
+            --error-txt:    #ff7b87;
+            --success-bg:   rgba(25, 195, 125, 0.12);
+            --success-bdr:  rgba(25, 195, 125, 0.35);
+            --success-txt:  #3dd68c;
+            --nav-h:        60px;
+        }
+
+        html, body {
+            min-height: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--bg-deep);
+            color: var(--text-main);
+        }
+
+        /* ── Fundo animado ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 15% 10%, rgba(108,99,255,0.14) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 85% 85%, rgba(245,197,66,0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 55% 5%, rgba(61,214,140,0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Navbar ── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            gap: 24px;
+            background: rgba(8, 8, 20, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-brand .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dk));
+            border-radius: 9px;
+            font-size: 17px;
+            box-shadow: 0 4px 12px rgba(108,99,255,0.4);
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover { color: var(--text-main); }
+
+        .nav-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-user {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-logout {
+            font-size: 0.82rem;
+            color: var(--red) !important;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,92,115,0.3);
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s !important;
+        }
+
+        .nav-logout:hover {
+            background: rgba(255,92,115,0.1);
+            color: #fff !important;
+        }
+
+        /* ── Container ── */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
+
+        /* ── Flash messages ── */
+        .flash {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            border: 1px solid;
+            animation: fadeIn 0.3s ease;
+        }
+        .flash.sucesso { background: var(--success-bg); border-color: var(--success-bdr); color: var(--success-txt); }
+        .flash.erro    { background: var(--error-bg);   border-color: var(--error-bdr);   color: var(--error-txt); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ── Card (elemento base reutilizável) ── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 20px 40px rgba(0,0,0,0.35);
+            margin-bottom: 20px;
+        }
+
+        /* ── Headings ── */
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── Botões ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: inherit;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(108,99,255,0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn:active { transform: translateY(0); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dk));
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(108,99,255,0.35);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dk));
+            border-color: transparent;
+            box-shadow: 0 6px 20px rgba(108,99,255,0.5);
+        }
+
+        .btn-danger {
+            background: rgba(255,92,115,0.12);
+            border-color: rgba(255,92,115,0.35);
+            color: var(--red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255,92,115,0.22);
+            border-color: rgba(255,92,115,0.6);
+        }
+
+        /* ── Botão info (azul) ── */
+        .btn-info {
+            background: rgba(33,150,243,0.12);
+            border-color: rgba(33,150,243,0.35);
+            color: #64b5f6;
+        }
+
+        .btn-info:hover {
+            background: rgba(33,150,243,0.22);
+            border-color: rgba(33,150,243,0.6);
+        }
+
+        /* ── Tabelas ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card-solid);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            font-size: 0.87rem;
+            border-bottom: 1px solid rgba(108,99,255,0.1);
+        }
+
+        th {
+            background: rgba(108,99,255,0.1);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td { color: var(--text-main); }
+
+        tr:last-child td { border-bottom: none; }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: rgba(108,99,255,0.07);
+        }
+
+        /* Linha de destaque (crédito) */
+        tr.highlight-green td {
+            background: rgba(61,214,140,0.08);
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        /* ── Formulários ── */
+        .form-group { margin-bottom: 18px; }
+
+        form label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 7px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        form input[type=text],
+        form input[type=email],
+        form input[type=password],
+        form input[type=file],
+        form select,
+        form textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 11px 14px;
+            color: var(--text-main);
+            font-size: 0.93rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            outline: none;
+        }
+
+        form input[type=text]:focus,
+        form input[type=email]:focus,
+        form input[type=password]:focus,
+        form select:focus,
+        form textarea:focus {
+            border-color: var(--border-focus);
+            background: rgba(108,99,255,0.07);
+            box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+        }
+
+        form input::placeholder { color: rgba(122,122,154,0.5); }
+
+        .hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        /* ── Badge de status ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .badge-green { background: rgba(61,214,140,0.15); color: var(--green); border: 1px solid rgba(61,214,140,0.3); }
+        .badge-muted { background: rgba(122,122,154,0.12); color: var(--text-muted); border: 1px solid rgba(122,122,154,0.2); }
+
+        /* ── Aviso / destaque de crédito ── */
+        .credit-banner {
+            background: rgba(61,214,140,0.08);
+            border: 1px solid rgba(61,214,140,0.3);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .credit-banner .label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 4px;
+        }
+
+        .credit-banner .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .credit-banner .percent {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--green);
+            text-align: right;
+        }
+
+        .credit-banner .percent-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* ── Aviso amarelo ── */
+        .alert-warning {
+            background: rgba(245,197,66,0.08);
+            border: 1px solid rgba(245,197,66,0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: var(--gold);
+            font-size: 0.87rem;
+        }
+
+        .alert-warning strong { display: block; margin-bottom: 6px; }
+
+        /* ── Utilitários ── */
+        .flex-gap { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+        .mb-8  { margin-bottom: 8px; }
+        .mb-16 { margin-bottom: 16px; }
+        .mb-24 { margin-bottom: 24px; }
+        .text-muted { color: var(--text-muted); }
+        .text-green { color: var(--green); }
+        .text-red   { color: var(--red); }
+        .text-gold  { color: var(--gold); }
+        .fw-bold { font-weight: 600; }
+        .empty-state { color: var(--text-muted); font-size: 0.9rem; padding: 20px 0; }
     </style>
 </head>
 <body>
     <nav>
-        <strong>⚖ Fiscal MVP</strong>
+        <a href="{{ url_for('empresa.index') }}" class="nav-brand">
+            <span class="brand-icon">⚖</span>
+            Inteligência Fiscal
+        </a>
         <a href="{{ url_for('empresa.index') }}">Empresas</a>
-        <span style="margin-left:auto; display:flex; align-items:center; gap:16px;">
+        <span class="nav-right">
             {% if session.usuario_nome %}
-                <span style="font-size:13px; color:#aaa;">👤 {{ session.usuario_nome }}</span>
-                <a href="{{ url_for('auth.logout') }}" style="font-size:13px; color:#ff7b87;">Sair</a>
+                <span class="nav-user">👤 {{ session.usuario_nome }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="nav-logout">Sair</a>
             {% endif %}
         </span>
     </nav>
+
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% for categoria, msg in messages %}
-                <div class="flash {{ categoria }}">{{ msg }}</div>
+                <div class="flash {{ categoria }}">
+                    {% if categoria == 'erro' %}⚠{% else %}✓{% endif %}
+                    {{ msg }}
+                </div>
             {% endfor %}
         {% endwith %}
+
         {% block content %}{% endblock %}
     </div>
 </body>

@@ -2,33 +2,40 @@
 {% block title %}Upload SPED — {{ empresa.nome }}{% endblock %}
 
 {% block content %}
-<h2>Upload de Arquivo SPED</h2>
-<p style="margin-bottom:14px; color:#444;">
-    Empresa: <strong>{{ empresa.nome }}</strong> ({{ empresa.cnpj }})
-</p>
-
-<form method="POST"
-      action="{{ url_for('sped.upload_sped', empresa_id=empresa.id) }}"
-      enctype="multipart/form-data"
-      style="max-width:500px;">
-
-    <div class="form-group">
-        <label for="arquivo_sped">Arquivo EFD-Contribuições *</label>
-        <input type="file"
-               id="arquivo_sped"
-               name="arquivo_sped"
-               accept=".txt,.sped,.efd"
-               style="display:block; margin-top:4px;"
-               required>
-        <span class="hint">
-            Formatos aceitos: .txt, .sped, .efd — Tamanho máximo: 50 MB<br>
-            O período de apuração será detectado automaticamente do registro |0000|.
-        </span>
+<div style="max-width:560px;">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+        <a href="{{ url_for('empresa.detalhe_empresa', empresa_id=empresa.id) }}" class="btn">← Voltar</a>
+        <h2 style="margin-bottom:0;">Upload de Arquivo SPED</h2>
     </div>
 
-    <div style="display:flex; gap:10px; margin-top:10px;">
-        <button type="submit" class="btn btn-primary">Enviar Arquivo</button>
-        <a href="{{ url_for('empresa.detalhe_empresa', empresa_id=empresa.id) }}" class="btn">Cancelar</a>
+    <div class="card">
+        <p class="text-muted mb-16">
+            Empresa: <strong class="text-main" style="color:var(--text-main);">{{ empresa.nome }}</strong>
+            &nbsp;—&nbsp; CNPJ: <strong>{{ empresa.cnpj }}</strong>
+        </p>
+
+        <form method="POST"
+              action="{{ url_for('sped.upload_sped', empresa_id=empresa.id) }}"
+              enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label for="arquivo_sped">Arquivo EFD-Contribuições *</label>
+                <input type="file"
+                       id="arquivo_sped"
+                       name="arquivo_sped"
+                       accept=".txt,.sped,.efd"
+                       required>
+                <span class="hint">
+                    Formatos aceitos: .txt, .sped, .efd — Tamanho máximo: 50 MB<br>
+                    O período de apuração será detectado automaticamente do registro |0000|.
+                </span>
+            </div>
+
+            <div class="flex-gap">
+                <button type="submit" class="btn btn-primary">↑ Enviar Arquivo</button>
+                <a href="{{ url_for('empresa.detalhe_empresa', empresa_id=empresa.id) }}" class="btn">Cancelar</a>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 {% endblock %}
